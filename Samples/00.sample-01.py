@@ -20,3 +20,5 @@ while True:
         print(f'축하합니다. {game_count} 만에 맞추셨습니다.')
         break
     game_count += 1
+
+# 난수를 생성한 후 난수를 맞추는 게임을 생성하는 코드
