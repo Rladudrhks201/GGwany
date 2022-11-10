@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "xx8onk2vsQFnsXwbuw1hqLx3wLWQu+WPT7RbdYgCdungnrBHI873VD8RlLqj4obcP5ufYh5av4L6Q7BEQd5gZA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\fitersking\\source\\repos\\CRUD_Sample1\\CRUDForm1\\CRUDForm1.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\fitersking\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\5.0.0\\microsoft.windowsdesktop.app.ref.5.0.0.nupkg.sha512",
+    "C:\\Users\\fitersking\\.nuget\\packages\\microsoft.netcore.app.ref\\5.0.0\\microsoft.netcore.app.ref.5.0.0.nupkg.sha512",
+    "C:\\Users\\fitersking\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\5.0.0\\microsoft.aspnetcore.app.ref.5.0.0.nupkg.sha512",
+    "C:\\Users\\fitersking\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.17\\microsoft.netcore.app.host.win-x64.5.0.17.nupkg.sha512"
+  ],
+  "logs": []
+}
