@@ -10,3 +10,4 @@ C:\Users\fitersking\source\repos\CRUD_Sample1\CRUDForm\obj\Debug\CRUDForm.csproj
 C:\Users\fitersking\source\repos\CRUD_Sample1\CRUDForm\obj\Debug\CRUDForm.exe
 C:\Users\fitersking\source\repos\CRUD_Sample1\CRUDForm\obj\Debug\CRUDForm.pdb
 C:\Users\fitersking\source\repos\CRUD_Sample1\CRUDForm\obj\Debug\CRUDForm.frmVIPMembers.resources
+C:\Users\fitersking\source\repos\CRUD_Sample1\CRUDForm\obj\Debug\CRUDForm.frmVIPMembersInput.resources

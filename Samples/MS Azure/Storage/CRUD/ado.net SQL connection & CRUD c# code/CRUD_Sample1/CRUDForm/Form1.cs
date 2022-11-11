@@ -34,6 +34,7 @@ namespace CRUDForm
 
         private void btnGetData_Click(object sender, EventArgs e)
         {
+            SqlCon = new SqlConnection(CONNECTION_STRING);
             string query = "SELECT * FROM production.brands";
             SqlCommand cmd = SqlCon.CreateCommand();
             cmd.CommandText = query;
