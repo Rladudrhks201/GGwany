@@ -1,0 +1,23 @@
+# 패키지 목록 업데이트
+sudo apt-get update
+
+# 필수 패키지 설치.
+sudo apt-get install -y wget apt-transport-https software-properties-common
+
+# Microsoft 리포지토리 GPG 키 다운로드
+wget -q "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb"
+
+# Microsoft 리포지토리 GPG 키 등록
+sudo dpkg -i packages-microsoft-prod.deb
+
+# packages.microsoft.com를 추가한 후 패키지의 목록 업데이트
+sudo apt-get update
+
+# PowerShell 설치
+sudo apt-get install -y powershell
+
+# PowerShell 시작
+pwsh
+
+# Azure PowerShell 모듈 설치
+Install-Module -Name Az -AllowClobber 

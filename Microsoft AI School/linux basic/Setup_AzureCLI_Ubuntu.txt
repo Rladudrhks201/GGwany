@@ -1,0 +1,15 @@
+1. 설치 프로세스에 필요한 패키지를 가져옵니다.
+sudo apt-get update
+sudo apt-get install ca-certificates curl apt-transport-https lsb-release gnupg
+
+2. Microsoft 서명 키를 다운로드하고 설치합니다.
+curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+
+3. Azure CLI 소프트웨어 리포지토리를 추가합니다.
+AZ_REPO=$(lsb_release -cs)
+echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
+
+4. 리포지토리 정보를 업데이트하고 azure-cli 패키지를 설치합니다.
+sudo apt-get update
+sudo apt-get install azure-cli
+
