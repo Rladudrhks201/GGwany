@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 
 # json 파일 읽기
 
-json_path = 'C:/Users/user/Documents/github/Microsoft AI School/learning/image01/annotations/instances_default.json'
+json_path = '/learning/image01/annotations/instances_default.json'
 # json_path = 'C:/Users/user/Documents/github/Microsoft AI School/learning/image_kiwi/annotations/instances_default.json'
 with open(json_path, 'r') as f:
     coco_info = json.load(f)
@@ -62,7 +62,7 @@ for i, image_info in enumerate(coco_info['images']):
     xml_frame = ET.SubElement(root, 'image', id=str(i), name=filename, width='%d' % width,
                               height='%d' % height)
 
-    file_path = os.path.join('C:/Users/user/Documents/github/Microsoft AI School/learning/image01/images',
+    file_path = os.path.join('/learning/image01/images',
                              filename)
     img = cv2.imread(file_path)
     try:

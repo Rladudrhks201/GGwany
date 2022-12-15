@@ -5,7 +5,7 @@ import numpy as np
 
 # json 파일 읽기
 
-json_path = 'C:/Users/user/Documents/github/Microsoft AI School/learning/image01/annotations/instances_seg.json'
+json_path = '/learning/image01/annotations/instances_seg.json'
 
 with open(json_path, 'r') as f:
     coco_info = json.load(f)
@@ -50,7 +50,7 @@ for image_info in coco_info['images']:
     height = image_info['height']
     img_id = image_info['id']
     # print(filename, width, height, img_id)
-    file_path = os.path.join('C:/Users/user/Documents/github/Microsoft AI School/learning/image01/images',
+    file_path = os.path.join('/learning/image01/images',
                              filename)
     img = cv2.imread(file_path)
     try:

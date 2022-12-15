@@ -20,7 +20,7 @@ def find_xml_file(xml_folder_path):
     return all_root
 
 
-xml_dirs = find_xml_file('C:/Users/user/Documents/github/Microsoft AI School/learning/image01/cvat_annotations/')
+xml_dirs = find_xml_file('/learning/image01/cvat_annotations/')
 # print(xml_dirs)
 
 for xml_dir in xml_dirs:
@@ -32,7 +32,7 @@ for xml_dir in xml_dirs:
         image_name = img_meta.attrib['name']
         image_height = int(img_meta.attrib['height'])
         image_width = int(img_meta.attrib['width'])
-        image_path = os.path.join('C:/Users/user/Documents/github/Microsoft AI School/learning/image01/images',
+        image_path = os.path.join('/learning/image01/images',
                                   image_name)
         image = cv2.imread(image_path)
 

@@ -140,7 +140,7 @@ test_batch_size = 64  # 1000
 os.makedirs('C:/Users/user/Desktop/data/bevtr', exist_ok=True)
 os.makedirs('C:/Users/user/Desktop/data/bevte', exist_ok=True)
 
-dt1 = pd.read_csv('./data/beverage.csv')
+dt1 = pd.read_csv('../data/beverage.csv')
 X_tr, X_te, Y_tr, Y_te = train_test_split(dt1.iloc[:, 1], dt1.iloc[:, 2], test_size=0.17)
 tr1 = pd.concat([X_tr, Y_tr], axis=1)
 te1 = pd.concat([X_te, Y_te], axis=1)
@@ -162,11 +162,11 @@ for i, j in tr1['label'], tr1['file_name']:
 
 
 trainset = CustomImageDataset(
-    annotations_file='./data/bevtr.csv',
+    annotations_file='../data/bevtr.csv',
     img_dir='C:/Users/user/Desktop/data/bevtr/'
 )
 testset = CustomImageDataset(
-    annotations_file='./data/bevte.csv',
+    annotations_file='../data/bevte.csv',
     img_dir='C:/Users/user/Desktop/data/bevte/'
 )
 
