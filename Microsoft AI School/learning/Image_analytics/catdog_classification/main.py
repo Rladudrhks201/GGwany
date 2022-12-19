@@ -42,6 +42,7 @@ class CatvsDogDataset(Dataset):
 
         if self.transform is not None:
             image = self.transform(image=image)["image"]
+        image = image.float()
         return image, label
 
     def __len__(self):
@@ -169,9 +170,10 @@ def train(train_loader, model, criterion, optimizer, epoch, params, save_dir):
     for i, (image, target) in enumerate(train_loader):
         images = image.to(params['device'])
         targets = target.to(params['device'])
+        targets = targets.unsqueeze(1)
 
         output = model(images)
-        loss = criterion(output, targets)
+        loss = criterion(output, targets.float())
         accuracy = calculate_accuracy(output, targets)
         metric_monitor.update('Loss', loss.item())
         metric_monitor.update('Accuracy', accuracy)
@@ -193,9 +195,10 @@ def validate(val_loader, model, criterion, epoch, params):
         for i, (image, target) in enumerate(val_loader):
             images = image.to(params["device"])
             targets = target.to(params["device"])
+            targets = targets.unsqueeze(1)
 
             output = model(images)
-            loss = criterion(output, targets)
+            loss = criterion(output, targets.float())
             accuracy = calculate_accuracy(output, targets)
             metric_monitor.update("Loss", loss.item())
             metric_monitor.update("Accuracy", accuracy)
