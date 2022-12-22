@@ -22,8 +22,9 @@ class custom_dataset(Dataset):
         # print(img, label)
         # img = img.float()
         # print(type(img))
-        return img, label
-
+        img = img.float()
+        # return img, label   # 학습용
+        return img, label, image_path   #테스트용
     def __len__(self):
         return len(self.image_file_path)
 
