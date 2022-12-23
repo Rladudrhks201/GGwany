@@ -7,7 +7,7 @@ import torch
 import hy_parameter
 from torchvision import models
 import torch.nn as nn
-from utils import train, validate, save_model
+from utils import train
 
 # device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

@@ -9,6 +9,7 @@ import cv2
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image
 
 def acc_function(correct, total):
     acc = correct / total * 100
@@ -26,9 +27,9 @@ def test(model, test_loader, device):
             img = data[0]
             img = (img.detach() * 255).byte().cpu().numpy()
             img = np.transpose(img, (1, 2, 0))
-            # img = img  * 255.0
             # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             img = img.astype(np.uint8).copy()
+
 
 
             file_name = os.path.basename(image_path)
@@ -60,13 +61,19 @@ def main():
         ToTensorV2()
     ])
 
+    test_transform2 = A.Compose([
+        A.Resize(height=224, width=224),
+        A.Cutout(num_holes=20, max_h_size=15, max_w_size=15, p=1)
+    ])
+
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     net = models.__dict__['resnet18'](pretrained=False, num_classes=4)
     net = net.to(device)
 
     net.load_state_dict(torch.load('./model/30.pt', map_location=device))  # 학습환경에 상관없게 현재 device 환경으로 적용
-    test_data = custom_dataset("C:\\Users\\user\\Desktop\\Search\\Data\\val", transform=test_transform)
+    test_data = custom_dataset("C:\\Users\\user\\Desktop\\Search\\Data\\val", transform=test_transform,
+                               transform2=test_transform2)
     test_loader = DataLoader(test_data, batch_size=1, shuffle=False)
     test(net, test_loader, device)
 
