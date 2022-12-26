@@ -32,6 +32,7 @@ def test(model, test_loader, device):
 
 
 
+
             file_name = os.path.basename(image_path)
             data, target = data.to(device), target.to(device)
             output = model(data)
@@ -57,14 +58,10 @@ def main():
     test_transform = A.Compose([
         A.Resize(height=224, width=224),
         # A.HorizontalFlip(p=1),
-        A.Cutout(num_holes=20, max_h_size=15, max_w_size=15, p=1),
+        A.Cutout(num_holes=10, max_h_size=15, max_w_size=15, p=1),
         ToTensorV2()
     ])
 
-    test_transform2 = A.Compose([
-        A.Resize(height=224, width=224),
-        A.Cutout(num_holes=20, max_h_size=15, max_w_size=15, p=1)
-    ])
 
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -72,8 +69,7 @@ def main():
     net = net.to(device)
 
     net.load_state_dict(torch.load('./model/30.pt', map_location=device))  # 학습환경에 상관없게 현재 device 환경으로 적용
-    test_data = custom_dataset("C:\\Users\\user\\Desktop\\Search\\Data\\val", transform=test_transform,
-                               transform2=test_transform2)
+    test_data = custom_dataset("C:\\Users\\user\\Desktop\\Search\\Data\\val", transform=test_transform)
     test_loader = DataLoader(test_data, batch_size=1, shuffle=False)
     test(net, test_loader, device)
 

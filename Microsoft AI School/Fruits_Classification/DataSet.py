@@ -20,8 +20,6 @@ class custom_dataset(Dataset):
         label = label_dict[label_temp]
         if self.transform:
             img = self.transform(image=image)['image']
-        if self.transform2:
-            img2 = self.transform2(image=image)['image']
         img = img.float()
         # return img, label   # 학습용
         return img, label, image_path   #테스트용
