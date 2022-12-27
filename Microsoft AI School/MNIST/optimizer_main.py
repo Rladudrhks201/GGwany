@@ -1,11 +1,11 @@
-import numpy as np
+import numpy
 import matplotlib.pyplot as plt
 from collections import OrderedDict
-from optimizer import *
+from optimizer import *  # 직접 제작한 optimizer 모듈 로드
 
 
 def f(x, y):
-    return x ** 2 / 20.0 + y ** 2
+    return x**2 / 20.0 + y**2
 
 
 def df(x, y):
@@ -15,14 +15,14 @@ def df(x, y):
 init_pos = (-7.0, 2.0)
 params = {}
 params['x'], params['y'] = init_pos[0], init_pos[1]
-
+print(params)  # {'x': -7.0, 'y': 2.0}
 grads = {}
 grads['x'], grads['y'] = 0, 0
 
 optimizers = OrderedDict()
 optimizers['SGD'] = SGD(lr=0.95)
 optimizers['Momentum'] = Momentum(lr=0.1)
-optimizers['Adagrad'] = AdaGrad(lr=1.5)
+optimizers['AdaGrad'] = AdaGrad(lr=1.5)
 optimizers['Adam'] = Adam(lr=0.3)
 
 idx = 1
@@ -45,7 +45,7 @@ for key in optimizers:
     X, Y = np.meshgrid(x, y)
     Z = f(X, Y)
 
-    # 외곽선 단순화
+    # 외각선 단순화
     mask = Z > 7
     Z[mask] = 0
 
