@@ -1,10 +1,13 @@
 import os.path
-
+import os
+import glob
 import torch
 import copy
 import matplotlib.pyplot as plt
 from albumentations.pytorch import ToTensorV2
 import albumentations as A
+import torchvision.models as models
+import torch.nn as nn
 
 
 def visualize_aug(dataset, idx=0, samples=10, cols=5):
@@ -30,9 +33,9 @@ def train(num_epoch, model, train_loader, val_loader, criterion, optimizer, sche
     best_loss = 9999
     for epoch in range(1, num_epoch + 1):
         for i, (imgs, labels) in enumerate(train_loader):
-            img, label = imgs.to(device), labels.to(device)
-
+            img, label = imgs.to(device).float(), labels.to(device).long()
             output = model(img)
+
             loss = criterion(output, label)
             scheduler.step()
             optimizer.zero_grad()
@@ -49,7 +52,7 @@ def train(num_epoch, model, train_loader, val_loader, criterion, optimizer, sche
                     epoch + 1, num_epoch, i + 1, len(train_loader), loss.item(), acc.item() * 100
                 ))
 
-        avrg_loss, val_acc = validation(epoch, model, val_loader, criterion, device)
+        avrg_loss, val_acc = validation(model, val_loader, criterion, device)
 
         if avrg_loss < best_loss:
             print(f'Best save at epoch >> {epoch}')
@@ -73,7 +76,7 @@ def validation(model, val_loader, criterion, device):
         batch_loss = 0
 
         for i, (imgs, labels) in enumerate(val_loader):
-            imgs, labels = imgs.to(device), labels.to(device)
+            imgs, labels = imgs.to(device).float(), labels.to(device).long()
             output = model(imgs)
             loss = criterion(output, labels)
             batch_loss += loss.item()
@@ -93,7 +96,88 @@ def validation(model, val_loader, criterion, device):
 
     return avrg_loss, val_acc
 
+
+def test_show(test_loader, device):
+    net = models.__dict__['resnet50'](pretrained=False)
+    num_ftrs = net.fc.in_features
+    net.fc = nn.Linear(num_ftrs, 53)
+    net.to(device)
+
+    model_path = '.\\weights\\best_resnet.pt'
+    net.load_state_dict(torch.load(model_path))
+
+    test_data_path = '.\\test'
+
+    label_dict = folder_name_det(test_data_path)
+
+    net.eval()
+    with torch.no_grad():
+        for i, (imgs, labels, path) in enumerate(test_loader):
+            inputs, outputs, paths = imgs.to(device).float(), labels.to(device).long(), path
+            import cv2
+            img = cv2.imread(paths[0])
+            predicted_outputs = net(inputs)
+            _, predicted = torch.max(predicted_outputs, 1)
+
+            labels_temp = labels.item()
+            pr_temp = predicted.item()
+            predicted_label = label_dict[str(pr_temp)]
+            answer_label = label_dict[str(labels_temp)]
+            cv2.putText(img, predicted_label, (10, 20), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
+            cv2.putText(img, answer_label, (10, 40), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
+            cv2.imshow('test', img)
+            cv2.waitKey()
+
 def save_model(model, save_dir, file_name='best_resnet.pt'):
     output_path = os.path.join(save_dir, file_name)
 
     torch.save(model.state_dict(), output_path)
+
+
+def test_species(test_loader, device):
+    net = models.__dict__['resnet50'](pretrained=False)
+    num_ftrs = net.fc.in_features
+    net.fc = nn.Linear(num_ftrs, 53)
+    net.to(device)
+
+    model_path = '.\\weights\\best_resnet.pt'
+    net.load_state_dict(torch.load(model_path))
+
+    test_data_path = '.\\test'
+    label_det = folder_name_det(test_data_path)
+    label_length = len(label_det)
+    labels_correct = list(0. for i in range(label_length))
+    labels_total = list(0. for i in range(label_length))
+
+    total = 0
+    correct = 0
+    net.eval()
+    with torch.no_grad():
+        for i, (imgs, labels) in enumerate(test_loader):
+            inputs, outputs = imgs.to(device).float(), labels.to(device).long()
+            predicted_outputs = net(inputs)
+            _, predicted = torch.max(predicted_outputs, 1)
+
+            labels_correct_running = (predicted == outputs).squeeze()
+            label = outputs[0]
+            if labels_correct_running.item():
+                labels_correct[label] += 1
+            labels_total[label] += 1
+            total += inputs.size(0)
+            correct += (outputs == predicted).sum().item()
+        acc = correct / total * 100
+    label_list = list(label_det.values())
+    for i in range(53):
+        # print('Accruacy to predict %5s : %2d % %'%(label_list[i], 100*labels_correct[i] / labels_total[i]))
+        print("Accuracy to predict %5s : %2d %%" % (label_list[i], 100 * labels_correct[i] / labels_total[i]))
+    print(f'Accuracy : {round(acc, 2)}%')
+
+
+def folder_name_det(folder_path):
+    folder_name = glob.glob(os.path.join(folder_path, "*"))
+    det = {}
+    for index, path in enumerate(folder_name):
+        temp_name = path.split('\\')[-1]
+        det[str(index)] = temp_name
+
+    return det

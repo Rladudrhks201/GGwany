@@ -38,14 +38,17 @@ def main(opt):
     # dataset
     train_dataset = custom_dataset(file_path=opt.train_path, transform=train_transform)
     val_dataset = custom_dataset(file_path=opt.val_path, transform=val_transform)
+    test_dataset = custom_dataset(file_path=opt.test_path, transform=val_transform)
 
     # dataloader
     train_loader = DataLoader(train_dataset, batch_size=opt.batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=opt.batch_size, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
     # model call
     net = models.__dict__['resnet50'](pretrained=True)
-    net.fc = nn.Linear(512, 53)
+    num_ftrs = net.fc.in_features
+    net.fc = nn.Linear(num_ftrs, 53)
     net.to(device)
 
     # loss
@@ -65,9 +68,15 @@ def main(opt):
     save_dir = opt.save_path
     os.makedirs(save_dir, exist_ok=True)
 
-    # train, val
+    # train, val or Test
     # train(num_epoch, model, train_loader, val_loader, criterion, optimizer, scheduler, save_dir, device)
-    train(10, net, train_loader, val_loader, criterion, optimizer, scheduler, save_dir, device)
+    train_flag = False
+    if train_flag == True:
+        train(30, net, train_loader, val_loader, criterion, optimizer, scheduler, save_dir, device)
+    else:
+        # test_species(test_loader, device)
+        test_show(test_loader, device)  # 사용하려면 custom dataset 수정필요
+
 
 def parse_opt():
     parser = argparse.ArgumentParser()
@@ -75,7 +84,11 @@ def parse_opt():
                         help='train data path')
     parser.add_argument("--val-path", type=str, default='.\\valid',
                         help='val data path')
-    parser.add_argument('--batch-size', type=int, default=32,
+    parser.add_argument('--test-path', type=str, default='.\\test',
+                        help='test data path')
+    parser.add_argument('--train-flag', type=bool, default=False,
+                        help='train or test flag')
+    parser.add_argument('--batch-size', type=int, default=126,
                         help='batch size')
     parser.add_argument('--lr', type=float, default=0.001,
                         help='lr number')

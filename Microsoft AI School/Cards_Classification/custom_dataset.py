@@ -43,7 +43,7 @@ class custom_dataset(Dataset):
         # print(label)
         if self.transform:
             img = self.transform(image=img)['image']
-        return img, label
+        return img, label, image_path
 
     def __len__(self):
         return len(self.file_path)
