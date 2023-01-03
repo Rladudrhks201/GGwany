@@ -7,7 +7,7 @@ import torch.nn as nn
 from torchvision import transforms
 from torchvision import models
 import torch.optim as optim
-from utils import train
+from utils import train, test
 
 
 # device
@@ -34,7 +34,7 @@ val_dataset = custom_dataset('.\\dataset\\val', transform=val_transform)
 test_dataset = custom_dataset('.\\dataset\\test', transform=val_transform)
 
 # DataLoader
-train_loader = DataLoader(train_dataset, batch_size=126, shuffle=True)
+train_loader = DataLoader(train_dataset, batch_size=126, shuffle=True, num_workers=4)
 val_loader = DataLoader(val_dataset, batch_size=126, shuffle=False)
 test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
@@ -49,4 +49,7 @@ optimizer = optim.SGD(net.parameters(), lr=0.001)
 
 # train model
 os.makedirs('.\\model', exist_ok=True)
-train(100, train_loader, val_loader, net, optimizer, criterion, device, '.\\model\\best.pt')
+
+if __name__ == '__main__':
+    # train(100, train_loader, val_loader, net, optimizer, criterion, device, '.\\model\\best.pt')
+    test(net, test_loader, device)

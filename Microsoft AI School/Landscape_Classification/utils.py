@@ -38,7 +38,7 @@ def train(n_epochs, train_loader, val_loader, model, optimizer, criterion, devic
             loss = criterion(output, targets)
 
             valid_loss = valid_loss + ((1 / (batch_idx + 1)) * (loss.data - valid_loss))
-            validLoss += valid_loss
+            validLoss += valid_loss.item()
             valid_batch += 1
 
         print('Epoch {} \t Training Loss : {:.6f} \t Validation Loss : {:.6f}'.format(
@@ -62,3 +62,25 @@ def train(n_epochs, train_loader, val_loader, model, optimizer, criterion, devic
     plt.ylabel('loss')
     plt.legend(['Train', 'Val'])
     plt.show()
+
+def acc_function(correct, total):
+    acc = correct / total * 100
+    return acc
+
+def test(model, data_loader, device):
+    model_path = '.\\model\\best.pt'
+    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.eval()
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for i, (image, label) in enumerate(data_loader):
+            images, labels = image.to(device), label.to(device)
+            output = model(images)
+            _, argmax = torch.max(output, 1)
+            total += images.size(0)
+            correct += (labels == argmax).sum().item()
+
+        acc = acc_function(correct, total)
+        print(f'acc >> {acc}%')
+
