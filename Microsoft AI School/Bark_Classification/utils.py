@@ -70,3 +70,20 @@ def validation(model, val_loader, criterion, device):
 
     model.train()
     return avg_loss, val_acc
+
+def test(model, test_loader, device):
+    model_path = '.\\models\\best.pt'
+    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.eval()
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for i, (imgs, labels) in enumerate(test_loader):
+            imgs, labels = imgs.to(device), labels.to(device)
+            output = model(imgs)
+            _, argmax = torch.max(output, 1)
+            total += imgs.size(0)
+            correct += (labels == argmax).sum().item()
+
+        acc = correct / total * 100
+        print(f'Accuracy for {total} image >> {acc}')

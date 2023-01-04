@@ -43,7 +43,7 @@ test_dataset = Custom_Dataset('.\\dataset\\test', transform=val_transform)
 # DataLoader
 train_loader = DataLoader(train_dataset, batch_size=126, shuffle=True, num_workers=2)
 val_loader = DataLoader(val_dataset, batch_size=126, shuffle=False)
-test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
+test_loader = DataLoader(test_dataset, batch_size=126, shuffle=False, num_workers=3)
 
 # pretrain start
 # model = rexnetv1.ReXNetV1()
@@ -53,7 +53,7 @@ test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
 # no pretrain start
 model = rexnetv1.ReXNetV1(classes=50)
-model.load_state_dict(torch.load('.\\models\\best.pt'))     # 모델 기반으로 돌림
+model.load_state_dict(torch.load('.\\models\\best.pt'))  # 모델 기반으로 돌림
 model.to(device)
 
 criterion = LabelSmoothingCrossEntropy()
@@ -63,4 +63,5 @@ save_dir = '.\\models'
 num_epochs = 100
 
 if __name__ == '__main__':
-    train(num_epochs, model, train_loader, val_loader, criterion, optimizer, save_dir, device)
+    # train(num_epochs, model, train_loader, val_loader, criterion, optimizer, save_dir, device)
+    test(model, test_loader, device)
