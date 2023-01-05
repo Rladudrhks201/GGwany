@@ -36,7 +36,7 @@ if __name__ == '__main__':
     criterion = LabelSmoothingCrossEntropy()
     optimizer = torch.optim.AdamW(efficient_net.parameters(), lr=0.0003, weight_decay=0.0005)
     scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[60, 90], gamma=0.1)
-    num_epochs = 50
+    num_epochs = 20
     os.makedirs('.\\models', exist_ok=True)
     save_path = '.\\models\\best.pt'
     best_val_acc = 0.0
@@ -93,5 +93,5 @@ if __name__ == '__main__':
             best_val_acc = val_accuracy
             torch.save(efficient_net.state_dict(), save_path)
 
-        if epoch == num_epochs - 1:
+        if epoch == num_epochs -1:
             dfForAccuracy.to_csv('.\\modelAccuracy.csv', index=False)
