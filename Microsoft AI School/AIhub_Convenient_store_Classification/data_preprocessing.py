@@ -4,7 +4,7 @@ import glob
 from PIL import Image
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
-from multiprocessing import Pool
+
 
 file_path1 = glob.glob(os.path.join('D:\\Data\\product_image', '*', 'image', '*', '*.jpg'))
 os.makedirs('.\\dataset', exist_ok=True)
