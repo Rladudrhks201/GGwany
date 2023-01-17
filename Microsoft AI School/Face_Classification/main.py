@@ -22,13 +22,13 @@ def train_val():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     train_transform = A.Compose([
-        A.Resize(width=87, height=87),
+        A.Resize(width=180, height=180),
         A.Normalize(),
         ToTensorV2()
     ])
 
     val_transform = A.Compose([
-        A.Resize(width=87, height=87),
+        A.Resize(width=180, height=180),
         A.Normalize(),
         ToTensorV2()
     ])
@@ -36,20 +36,20 @@ def train_val():
     train_dataset = custom_dataset('.\\dataset\\dataset\\train', transform=train_transform)
     val_dataset = custom_dataset('.\\dataset\\dataset\\val', transform=val_transform)
 
-    train_loader = DataLoader(train_dataset, batch_size=812, shuffle=True, num_workers=4, pin_memory=True)
-    val_loader = DataLoader(val_dataset, batch_size=812, shuffle=False, num_workers=4, pin_memory=True)
+    train_loader = DataLoader(train_dataset, batch_size=1024, shuffle=True, num_workers=4, pin_memory=True)
+    val_loader = DataLoader(val_dataset, batch_size=1024, shuffle=False, num_workers=4, pin_memory=True)
 
-    net = models.resnet50(pretrained=True)
-    net.fc = nn.Linear(in_features=2048, out_features=10)
+    # net = models.resnet50(pretrained=True)
+    # net.fc = nn.Linear(in_features=net.fc.in_features, out_features=10)
+    # net.to(device)
+
+    # net = models.shufflenet_v2_x2_0(weights='IMAGENET1K_V1')
+    # net.fc = nn.Linear(in_features=net.fc.in_features, out_features=10, bias=True)
+    # net.to(device)
+
+    net = models.resnet18(pretrained=True)
+    net.fc = nn.Linear(in_features=net.fc.in_features, out_features=10)
     net.to(device)
-
-    # net = models.shufflenet_v2_x1_0(weights='IMAGENET1K_V1')
-    # net.fc = nn.Linear(in_features=1024, out_features=11, bias=True)
-    # net.to(device)
-
-    # net = models.resnet18(pretrained=True)
-    # net.fc = nn.Linear(in_features=512, out_features=10)
-    # net.to(device)
 
     num_epochs = 10
     criterion = LabelSmoothingCrossEntropy()
@@ -62,6 +62,12 @@ def train_val():
     save_path = '.\\models\\best.pt'
     dfForAccuracy = pd.DataFrame(index=list(range(num_epochs)), columns=['Epoch', 'train_loss', 'train_acc',
                                                                          'val_loss', 'val_acc'])
+
+    label_dict = {'20_0': 0, '20_1': 1, '30_0': 2, '30_1': 3, '40_0': 4, '40_1': 5, '50_0': 6,
+                  '50_1': 7, '60_0': 8, '60_1': 9}
+    classes = list(label_dict.keys())
+    correct_pred = {classname: 0 for classname in classes}
+    total_pred = {classname: 0 for classname in classes}
 
     if os.path.exists(save_path):
         best_val_acc = max(pd.read_csv('.\\ModelAccuracy.csv')['val_acc'].tolist())
@@ -99,6 +105,12 @@ def train_val():
                 val_losses += loss.item()
 
                 val_acc += (torch.argmax(outputs, 1) == labels).sum().item()
+                predictions = torch.argmax(outputs, 1)
+                # 각 분류별로 올바른 예측 수를 모읍니다
+                for label, prediction in zip(labels, predictions):
+                    if label == prediction:
+                        correct_pred[classes[label]] += 1
+                    total_pred[classes[label]] += 1
 
         val_accuracy = val_acc / len(val_dataset)
         train_accuracy = train_acc / len(train_dataset)
@@ -108,6 +120,13 @@ def train_val():
         dfForAccuracy.loc[epoch, 'train_acc'] = round(train_accuracy, 3)
         dfForAccuracy.loc[epoch, 'val_loss'] = round(val_losses / val_steps, 3)
         dfForAccuracy.loc[epoch, 'val_acc'] = round(val_accuracy, 3)
+
+        for classname, correct_count in correct_pred.items():
+            accuracy = 100 * float(correct_count) / total_pred[classname]
+            print(f'Accuracy for class: {classname:5s} is {accuracy:.1f} %')
+            dfForAccuracy.loc[epoch, f'{classname}_acc'] = accuracy
+
+
 
         print(f'Epoch [{epoch + 1}/{num_epochs}]',
               f'Train Loss : {(running_loss / train_steps):.3f}',
@@ -128,28 +147,28 @@ def train_val():
 
 def test():
     test_transform = A.Compose([
-        A.Resize(width=224, height=224),
+        A.Resize(width=180, height=180),
         A.Normalize(),
         ToTensorV2()
     ])
-    test_dataset = custom_dataset('.\\dataset\\test', transform=test_transform)
+    test_dataset = custom_dataset('.\\dataset\\dataset\\test', transform=test_transform)
     test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=4, pin_memory=True)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # resnet50
     # net = models.resnet50(pretrained=False)
-    # net.fc = nn.Linear(in_features=2048, out_features=11)
+    # net.fc = nn.Linear(in_features=2048, out_features=10)
     # net.to(device)
 
-    # net = models.shufflenet_v2_x1_0(weights='IMAGENET1K_V1')
-    # net.fc = nn.Linear(in_features=1024, out_features=11, bias=True)
-    # net.to(device)
-
-    net = models.resnet18(pretrained=True)
-    net.fc = nn.Linear(in_features=512, out_features=10)
+    net = models.shufflenet_v2_x2_0(weights='IMAGENET1K_V1')
+    net.fc = nn.Linear(in_features=net.fc.in_features, out_features=10, bias=True)
     net.to(device)
 
-    model_path = '.\\models\\best_resnet18.pt'
+    # net = models.resnet18(pretrained=True)
+    # net.fc = nn.Linear(in_features=net.fc.in_features, out_features=10)
+    # net.to(device)
+
+    model_path = '.\\models\\best.pt'
     net.load_state_dict(torch.load(model_path, map_location=device))
     net.eval()
     correct = 0
