@@ -8,7 +8,6 @@ from PIL import Image
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-
 # 원 폴더명 저장
 
 def folder_name_save_and_name_change(file_path):
@@ -25,7 +24,6 @@ def folder_name_save_and_name_change(file_path):
     df = pd.DataFrame({'labelcode': labelcode, 'name': names})
     df.to_csv(f'.\\{os.path.basename(file_path)}_foldername.csv', index=False, encoding="utf-8-sig")
 
-
 # 이미지 리사이즈
 def image_resize(file_paths):
     for path in tqdm(file_paths, total=len(file_paths), desc='processing...'):
@@ -34,7 +32,7 @@ def image_resize(file_paths):
         img.save(path)
 
 
-if __name__ == '__main__':
+if __name__=='__main__':
     # folder_name_save_and_name_change('D:\\dataset\\Training\\labels')
     # folder_name_save_and_name_change('D:\\dataset\\Training\\images')
     # folder_name_save_and_name_change('D:\\dataset\\Validation\\labels')
@@ -47,6 +45,7 @@ if __name__ == '__main__':
     # folder_name_save_and_name_change('D:\\kyk\\Training\\images')
     # folder_name_save_and_name_change('D:\\New folder\\[라벨]커피차1_train')
 
+
     # tr_ls = glob.glob(os.path.join('D:\\dataset', '*', 'images', '*', '*.jpg'))
     # image_resize(tr_ls)
 
@@ -55,5 +54,5 @@ if __name__ == '__main__':
 
     d_img_path = glob.glob(os.path.join('D:\\dataset01', '*', 'images', '*.jpg'))
     # print(int(len(d_img_path) / 2))
-    d_img_path = d_img_path[:int(len(d_img_path) / 2) + 1]
+    d_img_path = d_img_path[int(len(d_img_path) / 2) + 1:]
     image_resize(d_img_path)
