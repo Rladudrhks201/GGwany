@@ -4,8 +4,6 @@
 import glob
 import os
 import xml.etree.ElementTree as ET
-import cv2
-import shutil
 import pandas as pd
 from tqdm import tqdm
 
