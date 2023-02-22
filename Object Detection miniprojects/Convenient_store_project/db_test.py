@@ -53,7 +53,7 @@ for path in id_paths:
 host_name = 'localhost'
 port = 3306
 user_name = 'root'
-user_password = 'rladudfks201!'                     # <-------- 이거 비번 저랑 다르시면 수정 필요해요
+user_password = '비번'                     # <-------- 이거 비번 저랑 다르시면 수정 필요해요
 database_name = 'product_detection'
 
 test_db = pymysql.connect( 
