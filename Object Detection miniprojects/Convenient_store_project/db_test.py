@@ -47,13 +47,11 @@ for path in id_paths:
                 print('딕셔너리 생성 오류', path)
                 exit()
 
-
-
 #데이터베이스 연결 전 데이터 기본 세팅
 host_name = 'localhost'
 port = 3306
 user_name = 'root'
-user_password = '비번'                     # <-------- 이거 비번 저랑 다르시면 수정 필요해요
+user_password = 'qlqjs'                     # <-------- 이거 비번 저랑 다르시면 수정 필요해요
 database_name = 'product_detection'
 
 test_db = pymysql.connect( 
@@ -82,11 +80,16 @@ xml_path = glob.glob(os.path.join('C:\\Users\\fiter\\Desktop\\final', '*.xml'))
 divl = []
 divl2 = []
 divn = []
+temp_dict = {}
 for path in tqdm(xml_path):
+    A_tr = 0
     tree = ET.parse(path)
     root = tree.getroot()
     element = root.find('div_cd')
     item_no = element.find('item_no').text
+    if 'A' in item_no:
+        item_no2 = item_no.replace('A', '100')
+        A_tr = 1
     barcd = element.find('barcd').text
     prod_nm = element.find('img_prod_nm').text
     div_l_name = element.find('div_l').text
@@ -122,18 +125,21 @@ for path in tqdm(xml_path):
     if div_l_no not in divl:
         cursor.execute(sql_div_large, (div_l_no, div_l_name))
         divl.append(div_l_no)
-    if div_n_no not in divn:
+    if (div_l_no, div_n_no) not in zip(divl2, divn):
         cursor.execute(sql_div_detail, (div_n_no, div_l_no, div_n_name))
         divl2.append(div_l_no)
         divn.append(div_n_no)
-    elif div_l_no not in divl2:
-        cursor.execute(sql_div_detail, (div_n_no, div_l_no, div_n_name))
-        divl2.append(div_l_no)
-        divn.append(div_n_no)
+
     try:
-        cursor.execute(sql_label, (item_no, barcd, prod_nm, div_n_no, volume, nutrition_info))
+        if A_tr:
+            cursor.execute(sql_label, (item_no2, barcd, prod_nm, div_n_no, volume, nutrition_info))
+        else:
+            cursor.execute(sql_label, (item_no, barcd, prod_nm, div_n_no, volume, nutrition_info))
     except:
+        print(temp_dict[item_no])
         print(path)
+
+    temp_dict[item_no] = path
 
 test_db.commit()
 test_db.close()
