@@ -51,7 +51,7 @@ for path in id_paths:
 host_name = 'localhost'
 port = 3306
 user_name = 'root'
-user_password = 'qlqjs'                     # <-------- 이거 비번 저랑 다르시면 수정 필요해요
+user_password = 'rladudfks201!'                     # <-------- 이거 비번 저랑 다르시면 수정 필요해요
 database_name = 'product_detection'
 
 test_db = pymysql.connect( 
@@ -73,14 +73,13 @@ cursor = test_db.cursor()
 # 각 테이블에 필요한 쿼리문
 sql_div_large = "INSERT INTO div_large (div_l_no, div_l_name) VALUES (%s, %s)"
 sql_div_detail = "INSERT INTO div_detail (div_n_no, div_l_label, div_n_name) VALUES (%s, %s, %s)"
-sql_label = "INSERT INTO label(item_no, barcd, prod_nm, div_n_no, volume, nutrition_info) VALUES (%s, %s, %s, %s, %s, %s)"
+sql_label = "INSERT INTO label(item_no, barcd, prod_nm, div_l_no, div_n_no, volume, nutrition_info) VALUES (%s, %s, %s, %s, %s, %s, %s)"
 
 
 xml_path = glob.glob(os.path.join('C:\\Users\\fiter\\Desktop\\final', '*.xml'))
 divl = []
 divl2 = []
 divn = []
-temp_dict = {}
 for path in tqdm(xml_path):
     A_tr = 0
     tree = ET.parse(path)
@@ -130,16 +129,10 @@ for path in tqdm(xml_path):
         divl2.append(div_l_no)
         divn.append(div_n_no)
 
-    try:
-        if A_tr:
-            cursor.execute(sql_label, (item_no2, barcd, prod_nm, div_n_no, volume, nutrition_info))
-        else:
-            cursor.execute(sql_label, (item_no, barcd, prod_nm, div_n_no, volume, nutrition_info))
-    except:
-        print(temp_dict[item_no])
-        print(path)
-
-    temp_dict[item_no] = path
+    if A_tr:
+        cursor.execute(sql_label, (item_no2, barcd, prod_nm, div_l_no, div_n_no, volume, nutrition_info))
+    else:
+        cursor.execute(sql_label, (item_no, barcd, prod_nm, div_l_no, div_n_no, volume, nutrition_info))
 
 test_db.commit()
 test_db.close()
