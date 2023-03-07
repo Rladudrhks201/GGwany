@@ -72,15 +72,15 @@ feature = df.columns[2:]
 
 
 # 예측할 작물의 가격의 4주치를 target에 설정
-df['target'] = df['배추_가격(원/kg)'].shift(-29)
+df['target'] = df['배추_가격(원/kg)'].shift(-28)
 
 
-df_learn = df[:-58]
-df_predict = df[-58:]
+df_learn = df[:-56]
+df_predict = df[-56:]
 train_X = df_learn[feature]
 train_y = df_learn['target']
-test_X = df_predict[:29][feature]
-test_y = df_predict[:29]['target']
+test_X = df_predict[:28][feature]
+test_y = df_predict[:28]['target']
 
 # 세 번째 탐색적 모델 (랜덤포레스트, XGBoost 사용)
 model = RandomForestRegressor()

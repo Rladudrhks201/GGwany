@@ -75,11 +75,30 @@ for i, col in enumerate(cols[1:]):
 # plt.show()
 # print(corr)
 
-# 시계열 분해
-df['resid'] = 0
-stl = STL(df[['일자', '배추_가격(원/kg)']].set_index('일자'), period=12)
-res = stl.fit()
-df['resid'] = res.resid.values
+corr = df[['건고추_가격(원/kg)', '깻잎_가격(원/kg)',
+         '당근_가격(원/kg)', '대파_가격(원/kg)',
+         '마늘_가격(원/kg)', '무_가격(원/kg)', '미나리_가격(원/kg)',
+         '배추_가격(원/kg)', '백다다기_가격(원/kg)',
+         '새송이_가격(원/kg)', '샤인머스캇_가격(원/kg)',
+         '시금치_가격(원/kg)', '애호박_가격(원/kg)',
+         '양배추_가격(원/kg)', '양파_가격(원/kg)',
+         '얼갈이배추_가격(원/kg)', '청상추_가격(원/kg)',
+         '토마토_가격(원/kg)', '파프리카_가격(원/kg)',
+         '팽이버섯_가격(원/kg)', '포도_가격(원/kg)']]
+corr = corr.corr(method='pearson')
+# sns.heatmap(corr)
+# plt.show()
+tp = corr[corr['배추_가격(원/kg)'] > 0.5].sort_values('배추_가격(원/kg)', ascending=False)
+print(tp['배추_가격(원/kg)'][:4])
+x = list(tp.index)
+x.remove('배추_가격(원/kg)')
+print(x)
 
-res.plot()
-plt.show()
+# 시계열 분해
+# df['resid'] = 0
+# stl = STL(df[['일자', '배추_가격(원/kg)']].set_index('일자'), period=12)
+# res = stl.fit()
+# df['resid'] = res.resid.values
+#
+# res.plot()
+# plt.show()
