@@ -64,43 +64,49 @@ df = df[['일자', '요일', '건고추_가격(원/kg)', '깻잎_가격(원/kg)'
 # feature, target 설정
 feature = df.columns[2:]
 # feature = ['배추_거래량(kg)', '배추_가격(원/kg)', '월', '화', '수', '목', '금', '토', '일']   # 성능이 더 낮음
-# 예측할 작물의 가격의 8일치를 target에 설정
-df['target'] = df['배추_가격(원/kg)'].shift(-8)
 
-df_learn = df[df['target'].notnull()]
-X = df_learn[feature]
-y = df_learn['target']
 
+# 예측할 작물의 1주일 뒤 가격을 target에 설정
+df['target'] = df['배추_가격(원/kg)'].shift(-7)
+
+# print(len(df)) 2612
+# 최근 4주의 데이터를 validation dataset으로 활용
+df_learn = df[:-35]
+df_predict = df[-35:]
+train_X = df_learn[feature]
+train_y = df_learn['target']
+test_X = df_predict[:-7][feature]
+test_y = df_predict[:-7]['target']
 
 # 두 번째 탐색적 모델 (랜덤포레스트, XGBoost 사용)
 model = RandomForestRegressor()
-model.fit(X, y)
+model.fit(train_X, train_y)
 
-y_pred = model.predict(X)
+y_pred = model.predict(test_X)
 # R2 = model.score(X_train, y_train)
-MAE = mean_absolute_error(y, y_pred)
+MAE = mean_absolute_error(test_y, y_pred)
 
 plt.figure(figsize=(20, 10), dpi=300)
-plt.title('RandomForest 예측 결과'+   '   MAE : ' + str(MAE)[:7])
+plt.title('RandomForest 예측 결과'+   ' Valid MAE : ' + str(MAE)[:7])
 plt.ylabel('가격')
-plt.plot(np.array(y), alpha = 0.9, label = 'Real')
-plt.plot(model.predict(X), alpha = 0.6, linestyle = "--", label = 'Predict')
+plt.plot(np.array(df['target']), alpha = 0.9, label = 'Real')
+plt.plot(model.predict(df[feature]), alpha = 0.6, linestyle = "--", label = 'Predict')
 plt.legend()
 plt.show()
 
 # XGBoost
 model = XGBRegressor()
-model.fit(X, y)
+model.fit(train_X, train_y)
 
-y_pred = model.predict(X)
+y_pred = model.predict(test_X)
 # R2 = model.score(X_train, y_train)
-MAE = mean_absolute_error(y, y_pred)
+MAE = mean_absolute_error(test_y, y_pred)
 
 plt.figure(figsize=(20, 10), dpi=300)
-plt.title('XGBoost 예측 결과'+   '   MAE : ' + str(MAE)[:7])
+plt.title('XGBoost 예측 결과'+   ' Valid MAE : ' + str(MAE)[:7])
 plt.ylabel('가격')
-plt.plot(np.array(y), alpha = 0.9, label = 'Real')
-plt.plot(model.predict(X), alpha = 0.6, linestyle = "--", label = 'Predict')
+plt.plot(np.array(df['target']), alpha = 0.9, label = 'Real')
+plt.plot(model.predict(df[feature]), alpha = 0.6, linestyle = "--", label = 'Predict')
 plt.legend()
 plt.show()
 

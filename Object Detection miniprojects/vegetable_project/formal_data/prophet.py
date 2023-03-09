@@ -10,14 +10,20 @@ import holidays
 from tqdm import tqdm
 import itertools
 import os
+import warnings
+
+warnings.filterwarnings('ignore')
 
 def train_prophet(csv_path='.\\combined_data2.csv', target_price='배추_가격(원/kg)'):
     # 한글 폰트
     from matplotlib import font_manager, rc
 
-    font_path = 'C:/Windows/Fonts/NGULIM.TTF'
+    font_path = 'C:/Windows/Fonts/batang.ttc'
     font = font_manager.FontProperties(fname=font_path).get_name()
     rc('font', family=font)
+
+    # 경로 저장 변수
+    target_price_csv = target_price.split('(')[0]
 
     df = pd.read_csv(csv_path, encoding='utf-8-sig')
     # 날짜 타입으로 변환
@@ -43,14 +49,14 @@ def train_prophet(csv_path='.\\combined_data2.csv', target_price='배추_가격(
     for col in cols0:
         df[col] = df[col].interpolate(method='linear').fillna(0)
 
-    # target과 상관관계가 0.5 이상인 변수 top 3개 추리기
+    # target과 상관관계가 0.5 이상인 변수 추리기
     corr = df[cols0]
     corr = corr.corr(method='pearson')
 
-    tp = corr[corr['배추_가격(원/kg)'] > 0.5].sort_values('배추_가격(원/kg)', ascending=False)
-    tp = tp['배추_가격(원/kg)'][:4]
+    tp = corr[corr[f'{target_price}'] > 0.5].sort_values(f'{target_price}', ascending=False)
+    tp = tp[f'{target_price}']
     x = list(tp.index)
-    x.remove('배추_가격(원/kg)')
+    x.remove(f'{target_price}')
 
     df['weekday'] = df['일자'].dt.weekday
     weekday_list = ['월', '화', '수', '목', '금', '토', '일']
@@ -95,11 +101,19 @@ def train_prophet(csv_path='.\\combined_data2.csv', target_price='배추_가격(
     df = df[['ds', 'y']]
 
     # grid Search Space
+    # search_space = {
+    #     'changepoint_prior_scale': [0.05, 0.1, 0.4, 0.5, 1.0, 5.0, 10.0],  # 추세의 유연성
+    #     'seasonality_prior_scale': [0.05, 0.1, 1.0, 10.0],  # 계절성의 유연성, 과적합 조절, 계절성의 영향
+    #     'holidays_prior_scale': [0.05, 0.1, 1.0, 10.0],  # 휴일의 유연성, 영향
+    #     'seasonality_mode': ['additive', 'multiplicative'],  # 증가 추세, additive는 폭에 변화 x, multiplicative는 폭에 변화
+    #     'holidays': [holiday_df]
+    # }
+    # 최적 값
     search_space = {
-        'changepoint_prior_scale': [0.05, 0.1, 0.4, 0.5, 1.0, 5.0, 10.0],  # 추세의 유연성
-        'seasonality_prior_scale': [0.05, 0.1, 1.0, 10.0],  # 계절성의 유연성, 과적합 조절, 계절성의 영향
-        'holidays_prior_scale': [0.05, 0.1, 1.0, 10.0],  # 휴일의 유연성, 영향
-        'seasonality_mode': ['additive', 'multiplicative'],  # 증가 추세, additive는 폭에 변화 x, multiplicative는 폭에 변화
+        'changepoint_prior_scale': [0.05, 0.1],  # 추세의 유연성
+        'seasonality_prior_scale': [10.0, 15.0],  # 계절성의 유연성, 과적합 조절, 계절성의 영향
+        'holidays_prior_scale': [1.0, 3.0],  # 휴일의 유연성, 영향
+        'seasonality_mode': ['additive'],  # 증가 추세, additive는 폭에 변화 x, multiplicative는 폭에 변화
         'holidays': [holiday_df]
     }
     # regressor add Space
@@ -121,21 +135,21 @@ def train_prophet(csv_path='.\\combined_data2.csv', target_price='배추_가격(
                     _m.add_regressor(regressor)
 
             _m.fit(df0)
-            _cv_df = cross_validation(_m, initial='1095 days', period='90 days', horizon='28 days', parallel='processes')
+            _cv_df = cross_validation(_m, initial='1460 days', period='230 days', horizon='28 days', parallel='processes')
             _df_p = performance_metrics(_cv_df, rolling_window=1)
             mapes.append(_df_p['mape'].values[0])
 
-        if os.path.exists('.\\temp.csv'):
+        if os.path.exists(f'.\\temp_{target_price_csv}.csv'):
             temp = pd.DataFrame(param_combined)
             temp['mapes'] = mapes
             temp['regressors'] = ', '.join(regressors)
             tuning_results = pd.concat([tuning_results, temp], axis=0)
-            tuning_results.to_csv(f'.\\params_prophet.csv', encoding='utf-8-sig')
+            tuning_results.to_csv(f'.\\params_prophet_{target_price_csv}.csv', encoding='utf-8-sig')
         else:
             tuning_results = pd.DataFrame(param_combined)
             tuning_results['mapes'] = mapes
             tuning_results['regressors'] = ', '.join(regressors)
-            tuning_results.to_csv(f'.\\temp.csv', encoding='utf-8-sig')
+            tuning_results.to_csv(f'.\\temp_{target_price_csv}.csv', encoding='utf-8-sig')
 
 
 # 실험적 모델링
@@ -166,4 +180,13 @@ def train_prophet(csv_path='.\\combined_data2.csv', target_price='배추_가격(
 # plt.show()
 
 if __name__ == '__main__':
-    train_prophet()
+    price_list = ['당근_가격(원/kg)', '대파_가격(원/kg)',
+             '마늘_가격(원/kg)', '무_가격(원/kg)',
+             '시금치_가격(원/kg)', '애호박_가격(원/kg)',
+             '양배추_가격(원/kg)', '양파_가격(원/kg)',
+             '청상추_가격(원/kg)',
+             '토마토_가격(원/kg)', '파프리카_가격(원/kg)',
+             '팽이버섯_가격(원/kg)', '포도_가격(원/kg)']
+    for price in price_list:
+        train_prophet(target_price=price)
+
