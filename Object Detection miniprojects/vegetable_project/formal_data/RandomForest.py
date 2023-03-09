@@ -61,12 +61,12 @@ def rf_gridsearchcv(csv_path='.\\combined_data2.csv', target_price='배추_가�
     # 예측할 작물의 가격의 4주치를 target에 설정
     df['target'] = df[f'{target_price}'].shift(-7)
 
-    df_learn = df[:-14]
-    df_predict = df[-14:]
+    df_learn = df[:-35]
+    df_predict = df[-35:]
     train_X = df_learn[feature]
     train_y = df_learn['target']
-    test_X = df_predict[:7][feature]
-    test_y = df_predict[:7]['target']
+    test_X = df_predict[:-7][feature]
+    test_y = df_predict[:-7]['target']
 
     # random forest grid search
     model = RandomForestRegressor()
