@@ -9,7 +9,9 @@ import os
 import glob
 from tqdm import tqdm
 import joblib
+import warnings
 
+warnings.filterwarnings('ignore')
 
 # 모델 성능 평가
 def compare_model_mae():
@@ -133,6 +135,7 @@ def train_save_model(target_price='배추_가격(원/kg)', save_dir='.\\final_mo
             plt.legend()
             plt.show()
 
+
     # XGBoost
     elif modelz == 'xgb':
         model2 = XGBRegressor(**xgb_dict)
@@ -155,6 +158,7 @@ def train_save_model(target_price='배추_가격(원/kg)', save_dir='.\\final_mo
             plt.plot(model2.predict(df[feature]), alpha=0.6, linestyle="--", label='Predict')
             plt.legend()
             plt.show()
+
 
     elif modelz == 'both':
         model1 = RandomForestRegressor(**rf_dict)
@@ -184,7 +188,8 @@ def train_save_model(target_price='배추_가격(원/kg)', save_dir='.\\final_mo
             plt.plot(np.array(df['target']), alpha=0.9, label='Real')
             plt.plot(model1.predict(df[feature]), alpha=0.6, linestyle="--", label='Predict')
             plt.legend()
-            plt.show()
+            # plt.show()
+            plt.savefig(f'{save_dir}\\graphs\\{target_type}_rf_graph.png', dpi=200)
 
             plt.figure(figsize=(20, 10), dpi=300)
             plt.title('XGBoost 예측 결과' + ' Valid MAE : ' + str(MAE2)[:7])
@@ -192,7 +197,8 @@ def train_save_model(target_price='배추_가격(원/kg)', save_dir='.\\final_mo
             plt.plot(np.array(df['target']), alpha=0.9, label='Real')
             plt.plot(model2.predict(df[feature]), alpha=0.6, linestyle="--", label='Predict')
             plt.legend()
-            plt.show()
+            # plt.show()
+            plt.savefig(f'{save_dir}\\graphs\\{target_type}_xgb_graph.png', dpi=200)
 
 
 if __name__ == '__main__':
@@ -204,5 +210,5 @@ if __name__ == '__main__':
                   '토마토_가격(원/kg)', '파프리카_가격(원/kg)',
                   '팽이버섯_가격(원/kg)', '포도_가격(원/kg)']
     for i in tqdm(price_list, colour='green'):
-        train_save_model(target_price=i)
+        train_save_model(target_price=i, plot_tf=True)
 
