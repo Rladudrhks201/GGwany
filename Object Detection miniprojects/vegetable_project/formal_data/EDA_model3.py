@@ -73,17 +73,17 @@ feature = df.columns[2:]
 # feature = ['배추_거래량(kg)', '배추_가격(원/kg)', '월', '화', '수', '목', '금', '토', '일']   # 성능이 더 낮음
 
 
-# 예측할 작물의 1주일 뒤 가격을 target에 설정
-df['target'] = df['배추_가격(원/kg)'].shift(-7)
+# 예측할 작물의 1일 뒤 가격을 target에 설정
+df['target'] = df['배추_가격(원/kg)'].shift(-1)
 
 # print(len(df)) 2612
 # 최근 4주의 데이터를 validation dataset으로 활용
-df_learn = df[:-35]
-df_predict = df[-35:]
+df_learn = df[:-30]
+df_predict = df[-30:]
 train_X = df_learn[feature]
 train_y = df_learn['target']
-test_X = df_predict[:-7][feature]
-test_y = df_predict[:-7]['target']
+test_X = df_predict[:-2][feature]
+test_y = df_predict[:-2]['target']
 
 # 세 번째 탐색적 모델 (랜덤포레스트, XGBoost 사용)
 model = RandomForestRegressor()
